@@ -149,12 +149,23 @@ def update_pos_view(posview, blocks):
     tilt_eps = 0.1
     x, y = int(posview.pos.x), int(posview.pos.y)
     z = int(posview.pos.z - EYE_HEIGHT + 0.01)
-    if blocks[z][y][x] != ' ':
-        posview.pos.z += 1
+    # if blocks[z][y][x] != ' ':
+    #     posview.pos.z += 1
+    # z = int(posview.pos.z - EYE_HEIGHT - 0.01)
+    # if blocks[z][y][x] == ' ':
+    #     posview.pos.z -= 1
+    
+    # Check bounds before accessing blocks
+    if 0 <= z < Z_BLOCKS and 0 <= y < Y_BLOCKS and 0 <= x < X_BLOCKS:
+        if blocks[z][y][x] != ' ':
+            posview.pos.z += 1
+            
     z = int(posview.pos.z - EYE_HEIGHT - 0.01)
-    if blocks[z][y][x] == ' ':
-        posview.pos.z -= 1
+    if 0 <= z < Z_BLOCKS and 0 <= y < Y_BLOCKS and 0 <= x < X_BLOCKS:
+        if blocks[z][y][x] == ' ':
+            posview.pos.z -= 1
 
+    # Camera rotation
     if is_key_pressed('w'):
         posview.view.psi += tilt_eps
     if is_key_pressed('s'):
@@ -163,3 +174,18 @@ def update_pos_view(posview, blocks):
         posview.view.phi -= tilt_eps
     if is_key_pressed('d'):
         posview.view.phi += tilt_eps
+
+if __name__ == "__main__":
+    import time
+    picture = [[' ' for _ in range(X_PIXELS)] for _ in range(Y_PIXELS)]
+    blocks = init_picture()
+    player = Player()
+    try:
+        while True:
+            process_input()
+            update_pos_view(player, blocks)
+            get_picture(picture, player, blocks)
+            draw_ascii(picture)
+            time.sleep(0.05)
+    except KeyboardInterrupt:
+        print("Exiting...")
